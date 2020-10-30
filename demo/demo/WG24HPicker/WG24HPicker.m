@@ -43,6 +43,8 @@
 @property (nonatomic, assign) NSInteger dayIndex;
 /** 第二列(时)当前下标 */
 @property (nonatomic, assign) NSInteger hourIndex;
+/** 第三列(分)当前下标 */
+@property (nonatomic, assign) NSInteger minuteIndex;
 /** 当前所选时 */
 @property (nonatomic, assign) NSUInteger currentHour;
 /** 当前所选分 */
@@ -501,27 +503,42 @@
         // 记录当前日的下标, 非常重要
         self.dayIndex = row;
         
-        // 刷新后2列
+        // 刷新时列
         [pickerView reloadComponent:1];
-        [pickerView reloadComponent:2];
+        
+        // 递规
+        if (self.hourIndex >= self.hourData.count) {
+            self.hourIndex = self.hourData.count - 1;
+        }
+        [self pickerView:pickerView didSelectRow:self.hourIndex inComponent:1];
+        
+        return;
     }
     else if (component == 1) {
         
         // 记录当前时的下标, 非常重要
         self.hourIndex = row;
         
-        // 刷新后1列
+        // 刷新分列
         [pickerView reloadComponent:2];
+        
+        // 递规
+        if (self.minuteIndex >= self.minuteData.count) {
+            self.minuteIndex = self.minuteData.count - 1;
+        }
+        [self pickerView:pickerView didSelectRow:self.minuteIndex inComponent:2];
+        
+        return;
+    }
+    else if (component == 2) {
+        
+        // 记录当前时的下标, 非常重要
+        self.minuteIndex = row;
     }
     
-    // 获取所有列当前所滚到的下标
-    NSInteger dayIndex = [pickerView selectedRowInComponent:0];
-    NSInteger hourIndex = [pickerView selectedRowInComponent:1];
-    NSInteger minuteIndex = [pickerView selectedRowInComponent:2];
-    
-    NSString *currentDay = self.dayData[dayIndex];
-    self.currentHour = [self.hourData[hourIndex] integerValue];
-    self.currentMinute = [self.minuteData[minuteIndex] integerValue];
+    NSString *currentDay = self.dayData[self.dayIndex];
+    self.currentHour = [self.hourData[self.hourIndex] integerValue];
+    self.currentMinute = [self.minuteData[self.minuteIndex] integerValue];
     
     self.hintLabel.text = [NSString stringWithFormat:@"%@%02zd时%02zd分", currentDay, self.currentHour, self.currentMinute];
 }
